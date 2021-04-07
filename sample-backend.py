@@ -24,6 +24,7 @@ def get_users():
                     subdict['users_list'].append(user)
             return subdict
 
+        # If only name is provided
         if search_username:
             print("In username")
             subdict = {'users_list': []}
