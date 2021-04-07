@@ -13,12 +13,25 @@ def hello_world():
 def get_users():
     if request.method == 'GET':
         search_username = request.args.get('name')
+        search_job = request.args.get('job')
+
+        # Method to search through list if both name and job are provided
+        if search_username and search_job:
+            print("Job")
+            subdict = {'users_list': []}
+            for user in users['users_list']:
+                if user['name'] == search_username and user['job'] == search_job:
+                    subdict['users_list'].append(user)
+            return subdict
+
         if search_username:
+            print("In username")
             subdict = {'users_list': []}
             for user in users['users_list']:
                 if user['name'] == search_username:
                     subdict['users_list'].append(user)
             return subdict
+
         return users
     elif request.method == 'POST':
         userToAdd = request.get_json()
@@ -47,32 +60,32 @@ def get_user(id):
 
 
 users = {
-   'users_list' :
-   [
-      {
-         'id' : 'xyz789',
-         'name' : 'Charlie',
-         'job': 'Janitor',
-      },
-      {
-         'id' : 'abc123',
-         'name': 'Mac',
-         'job': 'Bouncer',
-      },
-      {
-         'id' : 'ppp222',
-         'name': 'Mac',
-         'job': 'Professor',
-      },
-      {
-         'id' : 'yat999',
-         'name': 'Dee',
-         'job': 'Aspring actress',
-      },
-      {
-         'id' : 'zap555',
-         'name': 'Dennis',
-         'job': 'Bartender',
-      }
-   ]
+    'users_list' :
+    [
+        {
+            'id' : 'xyz789',
+            'name' : 'Charlie',
+            'job': 'Janitor',
+        },
+        {
+            'id' : 'abc123',
+            'name': 'Mac',
+            'job': 'Bouncer',
+        },
+        {
+            'id' : 'ppp222',
+            'name': 'Mac',
+            'job': 'Professor',
+        },
+        {
+            'id' : 'yat999',
+            'name': 'Dee',
+            'job': 'Aspring actress',
+        },
+        {
+            'id' : 'zap555',
+            'name': 'Dennis',
+            'job': 'Bartender',
+        }
+    ]
 }
