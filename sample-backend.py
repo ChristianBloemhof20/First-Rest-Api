@@ -2,6 +2,10 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask_cors import CORS
+
+import random
+import string
+
 app = Flask(__name__)
 CORS(app)
 
@@ -15,10 +19,18 @@ def get_users():
     if request.method == 'GET':
         search_username = request.args.get('name')
         search_job = request.args.get('job')
+        search_id = request.args.get('id')
+
+        # Method to get the individual through their "unique" (not unique) id
+        if search_id:
+            subdict = {'users_list': []}
+            for user in users['users_list']:
+                if user['id'] == search_id:
+                    subdict['users_list'].append(user)
+            return subdict
 
         # Method to search through list if both name and job are provided
         if search_username and search_job:
-            print("Job")
             subdict = {'users_list': []}
             for user in users['users_list']:
                 if user['name'] == search_username and user['job'] == search_job:
@@ -27,7 +39,6 @@ def get_users():
 
         # If only name is provided
         if search_username:
-            print("In username")
             subdict = {'users_list': []}
             for user in users['users_list']:
                 if user['name'] == search_username:
@@ -37,10 +48,22 @@ def get_users():
         return users
     elif request.method == 'POST':
         userToAdd = request.get_json()
+
+        # Generate randomized ID
+        id = ""
+        for i in range(3):
+            id = id + str(random.choice(string.ascii_letters))
+
+        id = id.lower()
+
+        for i in range(3):
+            id = id + str(random.randint(0, 9))
+
+        userToAdd['id'] = id
         users['users_list'].append(userToAdd)
         resp = jsonify(success=True)
-        # resp.status_code = 200 #optionally, you can always set a response code.
-        # 200 is the default code for a normal response
+        if resp.status_code == 200:
+            resp.status_code = 201
         return resp
     elif request.method == 'DELETE':
         resp = jsonify(success=False)
@@ -51,14 +74,21 @@ def get_users():
         return resp
 
 
-@app.route('/users/<id>')
+@app.route('/users/<id>', methods=['GET', 'DELETE'])
 def get_user(id):
     if id :
         for user in users['users_list']:
             if user['id'] == id:
+                if request.method == 'DELETE':
+                    users['users_list'].remove(user)
+                    resp = jsonify(success=True)
+                    if resp.status_code == 200:
+                        resp.status_code = 204
+                    return resp
                 return user
         return ({})
     return users
+    
 
 
 users = {
